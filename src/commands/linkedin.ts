@@ -17,7 +17,7 @@ export const command: Command = {
             type: InteractionResponseType.ChannelMessageWithSource,
             data: {
                 embeds: [{
-                    title: " ", // ¿Te aburres, desgraciado?
+                    title: "👷 ¿Te aburres, desgraciado?",
                     description: "¡Ah, veo que estás aquí en Discord en horario laboral! ¿No tienes vida social? ¿O es que tu único amigo es tu gato?\n\n" +
                                 " Ya que estás aquí perdiendo el tiempo, ¿por qué no buscas trabajo en LinkedIn?\n\n" +
                                 "Porque seamos sinceros:\n" +
