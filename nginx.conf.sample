@@ -1,0 +1,33 @@
+server {
+    server_name YOUR_DOMAIN;
+    
+    location / {
+        proxy_pass http://127.0.0.1:3000; # Replace with your backend server
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        proxy_buffering off;
+        proxy_request_buffering off;
+        proxy_pass_request_headers on;
+        proxy_pass_request_body on;
+    }
+
+    listen 443 ssl;
+    ssl_certificate /etc/letsencrypt/live/YOUR_DOMAIN/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/YOUR_DOMAIN/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+
+server {
+    if ($host = YOUR_DOMAIN) {
+        return 301 https://$host$request_uri;
+    }
+
+    server_name YOUR_DOMAIN;
+    listen 80;
+    return 404;
+}
