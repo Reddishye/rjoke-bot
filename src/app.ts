@@ -8,6 +8,9 @@ import {
 import type { APIInteraction } from 'discord-api-types/v10';
 import { VerifyDiscordRequest } from './utils.js';
 import { command as linkedinCommand } from './commands/linkedin.js';
+import { command as tictactoeCommand } from './commands/tictactoe.js';
+import { command as debugCommand } from './commands/debug.js';
+import { command as imgtogifCommand } from './commands/imgtogif.js';
 
 // Create an express app
 const app = express();
@@ -21,7 +24,10 @@ const router = express.Router();
 
 // Map of command handlers
 const commands = new Map([
-  ['linkedin', linkedinCommand]
+  ['linkedin', linkedinCommand],
+  ['tresenraya', tictactoeCommand],
+  ['debug', debugCommand],
+  ['imgtogif', imgtogifCommand]
 ]);
 
 /**
@@ -50,6 +56,19 @@ router.post('/interactions', async function (req: Request, res: Response) {
   if (interaction.type === InteractionType.ApplicationCommand) {
     const { name } = interaction.data;
     const command = commands.get(name);
+
+    if (command) {
+      await command.execute(interaction, res);
+      return;
+    }
+  }
+
+  /**
+   * Handle button interactions
+   */
+  if (interaction.type === InteractionType.MessageComponent) {
+    const commandName = interaction.data.custom_id.split('_')[0];
+    const command = commands.get(commandName);
 
     if (command) {
       await command.execute(interaction, res);
