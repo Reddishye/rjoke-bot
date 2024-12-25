@@ -12,14 +12,14 @@ import { createErrorEmbed, createInfoEmbed, createSuccessEmbed } from './shared'
 import { t } from '../i18n';
 import { 
     downloadImage, 
-    convertToGif, 
+    addBubbleToGif, 
     MAX_FILE_SIZE, 
     SUPPORTED_FORMATS 
 } from '../utils/imageProcessing';
 
 export const messageCommand: Command = {
     data: {
-        name: 'Image To Gif',
+        name: 'Image To Gif With Bubble',
         type: ApplicationCommandType.Message,
         dm_permission: false,
         integration_types: [0, 1],
@@ -36,7 +36,7 @@ export const messageCommand: Command = {
                     data: {
                         embeds: [createErrorEmbed(
                             t(locale, 'common.error', {}, userId),
-                            t(locale, 'imgtogif.invalidInteraction', {}, userId)
+                            t(locale, 'imgtogifwithbubble.invalidInteraction', {}, userId)
                         )],
                         flags: 64
                     }
@@ -54,7 +54,7 @@ export const messageCommand: Command = {
                     data: {
                         embeds: [createErrorEmbed(
                             t(locale, 'common.error', {}, userId),
-                            t(locale, 'imgtogif.noImage', {}, userId)
+                            t(locale, 'imgtogifwithbubble.noImage', {}, userId)
                         )],
                         flags: 64
                     }
@@ -72,7 +72,7 @@ export const messageCommand: Command = {
 
 export const imageCommand: Command = {
     data: {
-        name: 'Convert to GIF',
+        name: 'Convert to GIF with Bubble',
         type: ApplicationCommandType.User,
         dm_permission: false,
         integration_types: [0, 1],
@@ -104,9 +104,9 @@ export const imageCommand: Command = {
 };
 
 async function processImage(
-    attachment: APIAttachment, 
-    interaction: APIInteraction, 
-    res: Response, 
+    attachment: APIAttachment,
+    interaction: APIInteraction,
+    res: Response,
     locale: string,
     userId?: string
 ): Promise<void> {
@@ -116,7 +116,7 @@ async function processImage(
         data: {
             embeds: [createInfoEmbed(
                 t(locale, 'common.processing', {}, userId),
-                t(locale, 'imgtogif.processing', {}, userId)
+                t(locale, 'imgtogifwithbubble.processing', {}, userId)
             )]
         }
     });
@@ -129,21 +129,17 @@ async function processImage(
         throw new Error('imageTooLarge');
     }
 
-    // Download the image
-    console.log('Downloading image:', attachment.url);
+    // Download and process the image
     const imageBuffer = await downloadImage(attachment.url);
-    
-    // Convert to GIF
-    console.log('Converting to GIF...');
-    const gifBuffer = await convertToGif(imageBuffer);
+    const gifBuffer = await addBubbleToGif(imageBuffer);
 
     // Send the GIF as response
     const formData = new FormData();
-    formData.append('file', new Blob([gifBuffer], { type: 'image/gif' }), 'converted.gif');
+    formData.append('file', new Blob([gifBuffer], { type: 'image/gif' }), 'converted_with_bubble.gif');
     formData.append('payload_json', JSON.stringify({
         embeds: [createSuccessEmbed(
             t(locale, 'common.ready', {}, userId),
-            t(locale, 'imgtogif.success', {}, userId)
+            t(locale, 'imgtogifwithbubble.success', {}, userId)
         )]
     }));
 
@@ -160,7 +156,7 @@ async function processImage(
 }
 
 async function handleError(error: unknown, interaction: APIInteraction, locale: string, userId?: string): Promise<void> {
-    console.error('Error in imgtogif command:', error);
+    console.error('Error in imgtogifwithbubble command:', error);
     const webhookUrl = `https://discord.com/api/v10/webhooks/${interaction.application_id}/${interaction.token}/messages/@original`;
     await fetch(webhookUrl, {
         method: 'PATCH',
@@ -170,12 +166,12 @@ async function handleError(error: unknown, interaction: APIInteraction, locale: 
         body: JSON.stringify({
             embeds: [createErrorEmbed(
                 t(locale, 'common.error', {}, userId),
-                t(locale, `imgtogif.${error instanceof Error ? error.message : 'unknownError'}`, {}, userId)
+                t(locale, `imgtogifwithbubble.${error instanceof Error ? error.message : 'unknownError'}`, {}, userId)
             )],
             flags: 64
         })
     });
 }
 
-// Export both commands
+// Export commands
 export const command = messageCommand;

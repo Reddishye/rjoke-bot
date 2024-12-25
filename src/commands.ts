@@ -1,18 +1,24 @@
 import 'dotenv/config';
 import { InstallGlobalCommands } from './utils';
 import { command as linkedinCommand } from './commands/linkedin';
-import { command as tictactoeCommand } from './commands/tictactoe';
 import { command as debugCommand } from './commands/debug';
-import { command as imgtogifCommand } from './commands/imgtogif';
+import { command as imgtogifCommand, imageCommand as imgtogifImageCommand } from './commands/imgtogif';
+import { command as imgtogifwithbubbleCommand, imageCommand as imgtogifwithbubbleImageCommand } from './commands/imgtogifwithbubble';
+import { command as imagetogifwithtextCommand } from './commands/imagetogifwithtext';
+import { command as langCommand } from './commands/lang';
 import type { Command } from './commands/types';
 import type { APIInteraction } from 'discord-api-types/v10';
 import type { Response } from 'express';
 
-const commands: Command[] = [
+export const commands: Command[] = [
     linkedinCommand,
-    tictactoeCommand,
     debugCommand,
-    imgtogifCommand
+    imgtogifCommand,
+    imgtogifImageCommand,
+    imgtogifwithbubbleCommand,
+    imgtogifwithbubbleImageCommand,
+    imagetogifwithtextCommand,
+    langCommand
 ];
 
 export function getCommandsData() {
@@ -52,11 +58,9 @@ export async function registerCommands() {
     }
 }
 
-// Only run if this file is being run directly
-if (require.main === module) {
-    console.log('Running command registration...');
-    registerCommands().catch(err => {
-        console.error('Failed to register commands:', err);
-        process.exit(1);
-    });
-}
+// Run registration
+console.log('Running command registration...');
+registerCommands().catch(err => {
+    console.error('Failed to register commands:', err);
+    process.exit(1);
+});
