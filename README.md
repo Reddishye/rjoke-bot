@@ -1,3 +1,7 @@
+> [!IMPORTANT]
+> This bot has now been rewritten in Java and repository made private.
+> This repository will remain as a public archive
+
 # RJokeBot
 
 A fun Discord bot that brings humor to your server with various commands. Currently featuring a LinkedIn-themed joke command, with more entertaining features coming soon!
